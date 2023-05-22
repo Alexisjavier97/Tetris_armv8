@@ -1,4 +1,4 @@
-# Lab_ODC_TEtris
+# Lab_ODC_Tetris
 Trabajo sobre el laboratorio de organizacion del computador
 
 Integrantes :
