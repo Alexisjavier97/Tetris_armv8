@@ -8,7 +8,7 @@
 
 .globl main
 
-//SECCION COLORES
+//SECCION COLORES 
 
 //Bloque Verde 
 
@@ -41,61 +41,147 @@ color_bordea_al_bloque_violeta: .word 0x3f3f74
 color_adentro_del_bloque_violeta: .word 0xc487dc
 
 
-color_de_fondo_superior: .word 0x306082
-color_cuadrado_pequeno_fondo_sup: .word 0x323c39
+//Colores de fondo
 
-color_cuadrado_pequeno_fondo_inf: .word 0x306082
-color_de_fondo_inferior: .word 0x323c39
+color_rosa_fondo:  .word 0xfffbf2
 
-
-
-
-
-//pintar_triangulo:
-//		br lr
-
-
+cuadrado_fondo_violeta: .word 0xba9dc9
+cuadrado_fondo_celeste: .word 0x66caec
+circulo_fondo_verde:.word 0xa7d278
+circulo_fondo_rojo: .word 0xe55d47
+triangulo_fondo_amarillo: .word 0xfbbb3a
+triangulo_fondo_rosa: .word 0xf9a0a6
+color_sombra_oscura: .word 0x1c1a18
+color_escaleritas: .word 0xe8b942
 
 
-pintar_rectangulo:
-
+/*
+pintar_mini_cuadrados_celestes:
 		
-		mov x2, x3        // Y Size
+		ldur x10,cuadrado_fondo_celeste
+		//posicion x
+		//posicion y
+
+		bl pintar_cuadrado
+		br lr 
+
+pintar_mini_cuadrados_violetas :
+		
+		ldur x10,cuadrado_fondo_violeta
+		//posicion x
+		//posicion y
+
+		bl pintar_cuadrado
+		br lr 
+
+
+pintar_mini_circulos_rojos:
+		
+		ldur x10,circulo_fondo_rojo
+		bl pintar_circulo
+		br lr 
+
+
+pintar_mini_circulos_verdes:
+		
+		ldr x10,circulo_fondo_verde
+		bl pintar_circulo
+		br lr 
+
+pintar_mini_triangulos_rosados:
+
+		ldr x10,triangulo_fondo_rosa
+
+		bl pintar_triangulo
+		br lr 
+
+pintar_mini_triangulos_amarillos:
+
+		ldr x10,triangulo_fondo_amarillo
+		bl pintar_triangulo
+
+		br lr 
+*/
+ubicar_pixel:
+
+	   	
+	   mul x9,x2,x4 // =640*y
+	   
+	   add x9,x9,x1 //x+[640*y]
+	   lsl x9,x9,#2  // 4*[x + (y * 640)     
+	   add x9,x9,x0 // x0 + 4*[x + (y * 640)]		
+	   br lr 
+
+
+pintar_cuadrado :
+
+		mov x5,x4         // Y Size
 	loop1:
-		mov x1, x4         // X Size
+		mov x6,x3         // X Size
 	loop0:
-		stur w10,[x0]  // Colorear el pixel N
-		add x0,x0,4    // Siguiente pixel
-		sub x1,x1,1    // Decrementar contador X
-		cbnz x1,loop0  // Si no terminó la fila, salto
-		sub x2,x2,1    // Decrementar contador Y
-		cbnz x2,loop1  // Si no es la última fila, salto
+		
+		stur w10,[x9]  // Colorear el pixel N
+		add x9,x9,4    // Siguiente pixel
+		sub x6,x6,1    // Decrementar contador X
+		cbnz x6,loop0  // Si no terminó la fila, salto
+		sub x5,x5,1    // Decrementar contador Y
+		cbnz x5,loop1  // Si no termino la columna,salto 
 
 		br lr 
 
+pintar_mini_cuadrados_celestes:
+		
+		ldr x10,cuadrado_fondo_celeste
+		mov x1,150 //posicion x
+		mov x2,150 //posicion y
+		mov x3,75 //ancho x
+		mov x4,75 //altura y
 
-pintarfondo:
+		bl ubicar_pixel //devuelve el pixel desde donde comenzar a pintar
 
-		ldr x10, color_de_fondo_superior
-		mov x3,160
-		mov x4,640
-		bl pintar_rectangulo
+		bl pintar_cuadrado
 		br lr 
 
-pintartetris:
+color_fondo:
+		
+		ldr x10,color_rosa_fondo
+		mov x1,0 //posicion x
+		mov x2,0 //posicion y
+		mov x3,SCREEN_WIDTH //ancho x
+		mov x4,SCREEN_HEIGH //altura y
 
-		bl pintarfondo
+		bl ubicar_pixel //devuelve el pixel desde donde comenzar a pintar
 
+		bl pintar_cuadrado
+		br lr
+
+
+pintar_fondo:
+		
+		bl color_fondo
+		//bl pintar_mini_cuadrados_celestes
+		
+		
+		/*bl pintar_mini_cuadrados_violetas
+		bl pintar_mini_circulos_verdes
+		bl pintar_mini_circulos_rojos
+		bl pintar_mini_triangulos_rosados
+		bl pintar_mini_triangulos_amarillos
+		*/
 		br lr 
 
 
+tetris:
 
+	br lr 
 
 main:
 	// x0 contiene la direccion base del framebuffer
-	mov x20, x0 // Guarda la dirección base del framebuffer en x20
+	//mov x20, x0 // Guarda la dirección base del framebuffer en x20
 	
-	bl pintartetris
+	bl pintar_fondo //se hace la llamada para pintar el fondo de la escenografia
+	//bl tetris se pinta el tetris
+
 
 	// Ejemplo de uso de gpios
 	mov x9, GPIO_BASE
@@ -122,6 +208,14 @@ main:
 
 	//---------------------------------------------------------------
 	// Infinite Loop
+
+
+
+
+
+
+	
+	
 
 InfLoop:
 	b InfLoop
