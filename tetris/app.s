@@ -8,6 +8,19 @@
 
 .globl main
 
+.equ SCREEN_WIDTH,   640
+.equ SCREEN_HEIGH,   480
+.equ BITS_PER_PIXEL, 32
+
+.equ GPIO_BASE,    0x3f200000
+.equ GPIO_GPFSEL0, 0x00
+.equ GPIO_GPLEV0,  0x34
+
+
+
+
+.globl main
+
 //SECCION COLORES 
 
 //Bloque Verde 
@@ -55,132 +68,710 @@ color_sombra_oscura: .word 0x1c1a18
 color_escaleritas: .word 0xe8b942
 
 
-/*
-pintar_mini_cuadrados_celestes:
-		
-		ldur x10,cuadrado_fondo_celeste
-		//posicion x
-		//posicion y
-
-		bl pintar_cuadrado
-		br lr 
-
-pintar_mini_cuadrados_violetas :
-		
-		ldur x10,cuadrado_fondo_violeta
-		//posicion x
-		//posicion y
-
-		bl pintar_cuadrado
-		br lr 
 
 
-pintar_mini_circulos_rojos:
-		
-		ldur x10,circulo_fondo_rojo
-		bl pintar_circulo
-		br lr 
+pintar:
+
+	sub sp,sp,#8
+	str lr,[sp]
 
 
-pintar_mini_circulos_verdes:
-		
-		ldr x10,circulo_fondo_verde
-		bl pintar_circulo
-		br lr 
-
-pintar_mini_triangulos_rosados:
-
-		ldr x10,triangulo_fondo_rosa
-
-		bl pintar_triangulo
-		br lr 
-
-pintar_mini_triangulos_amarillos:
-
-		ldr x10,triangulo_fondo_amarillo
-		bl pintar_triangulo
-
-		br lr 
-*/
-ubicar_pixel:
-
-	   	
-	   mul x9,x2,x4 // =640*y
-	   
-	   add x9,x9,x1 //x+[640*y]
-	   lsl x9,x9,#2  // 4*[x + (y * 640)     
-	   add x9,x9,x0 // x0 + 4*[x + (y * 640)]		
-	   br lr 
-
-
-pintar_cuadrado :
-
-		mov x5,x4         // Y Size
+		mov x5,x8         // Y Size
 	loop1:
-		mov x6,x3         // X Size
-	loop0:
+		mov x6,x7         // X Size
+	loop0:	
+		stur w10,[x9]       // Set color of pixel N
+		add x9,x9,4       // Next pixel
+	    sub x6,x6,1       // decrement X counter
+	    cbnz x6,loop0      // If not end row jump
+	    sub x5,x5,1       // Decrement Y counter
+	    add x9,x9,#2560
+	    lsl x13,x7,2
+	    sub x9,x9,x13
+	    cbnz x5,loop1      // if not last row, jump	
+	
+	ldr lr,[sp]
+	add sp,sp,#8
+
+
+	br lr
+
+
+pintar_cuadrado:
+
+		sub sp,sp,#8
+		str lr,[sp]
+	
+		bl pintar
 		
-		stur w10,[x9]  // Colorear el pixel N
-		add x9,x9,4    // Siguiente pixel
-		sub x6,x6,1    // Decrementar contador X
-		cbnz x6,loop0  // Si no terminó la fila, salto
-		sub x5,x5,1    // Decrementar contador Y
-		cbnz x5,loop1  // Si no termino la columna,salto 
+		ldr lr,[sp]
+		add sp,sp,#8
+		br lr	
+
+
+
+
+pintar_rectangulo:
+		
+		sub sp,sp,#8
+		str lr,[sp]
+
+		bl pintar
+
+		ldr lr,[sp]
+		add sp,sp,#8
+		br lr
+
+
+
+ubicar_pixel : 
+		
+		sub sp,sp,#8
+		str lr,[sp]
+
+		
+		mov x3,SCREEN_WIDTH // valor de 640
+		mul x4,x3,x2 	//x4 = 640*y
+		add x4,x4,x1 // x4 = x +(640*y)
+			   
+		lsl x4,x4,2   // 4*(x+(640*y))
+
+		add x9,x0,x4	//direccion del pixel [x,y]		   	
+	
+		ldr lr,[sp]
+		add sp,sp,#8
+		br lr
+
+pintar_linea_vertical:
+		
+		sub sp,sp,#8
+		str lr,[sp]
+
+		bl pintar
+
+		ldr lr,[sp]
+		add sp,sp,#8
+		br lr
+
+pintar_linea_horizontal:
+		
+		sub sp,sp,#8
+		str lr,[sp]
+
+		bl pintar
+
+		ldr lr,[sp]
+		add sp,sp,#8
+		br lr
+
+pintar_bordes_amarillos:
+
+	sub sp,sp,#8
+	str lr,[sp]
+
+	ldr x10,color_bordea_al_bloque_amarillo
+
+	//linea horizontal del bloque
+		mov x1,91     //posicion x del pixel N
+		mov x2,417  //posicion y del pixel N
+		bl ubicar_pixel
+
+		mov x7,182 // ancho del borde
+		mov x8,6 // largo del borde
+		bl pintar_linea_horizontal
+
+		ldr lr,[sp]
+		add sp,sp,#8
+
+
+
+	br lr
+
+pintar_bordes_verdes:
+		
+		sub sp,sp,#8
+		str lr,[sp]
+
+		ldr x10,color_bordea_al_bloque_verde
+		
+		//linea vertical izq
+		mov x1,0     //posicion x del pixel N
+		mov x2,240  //posicion y del pixel N
+		bl ubicar_pixel
+
+		mov x7,3 // ancho del borde
+		mov x8,240 // largo del borde
+		bl pintar_linea_vertical
+
+		//linea horizontal superior
+		mov x1,0     //posicion x del pixel N
+		mov x2,240  //posicion y del pixel N
+		bl ubicar_pixel
+
+		mov x7,91 // ancho del borde
+		mov x8,3 // largo del borde
+		bl pintar_linea_horizontal
+
+		//linea vertical der
+		mov x1,88   //posicion x del pixel N
+		mov x2,240  //posicion y del pixel N
+		bl ubicar_pixel
+
+		mov x7,3 // ancho del borde
+		mov x8,240 // largo del borde
+		bl pintar_linea_vertical
+
+
+		//linea horizontal  del bloque 
+		mov x1,0     //posicion x del pixel N
+		mov x2,297  //posicion y del pixel N
+		bl ubicar_pixel
+
+		mov x7,91 // ancho del borde
+		mov x8,6 // largo del borde
+		bl pintar_linea_horizontal
+
+		//linea horizontal  del bloque
+		mov x1,0     //posicion x del pixel N
+		mov x2,357  //posicion y del pixel N
+		bl ubicar_pixel
+
+		mov x7,91 // ancho del borde
+		mov x8,6 // largo del borde
+		bl pintar_linea_horizontal
+
+		//linea horizontal del bloque
+		mov x1,0     //posicion x del pixel N
+		mov x2,417  //posicion y del pixel N
+		bl ubicar_pixel
+
+		mov x7,91 // ancho del borde
+		mov x8,6 // largo del borde
+		bl pintar_linea_horizontal
+
+		ldr lr,[sp]
+		add sp,sp,#8
+		br lr
+
+/*
+	//Este procedimiento pinta los cuatro circulitos verdes que estan al fondo de la pantalla
+
+pintar_mini_circulitos_verdes:
+		
+		ldr x10,circulo_fondo_verde // cargo el color verde
+
+		//primer circulito de la primera fila verde 
+		mov x1,50 //posicion x del pixel  N 
+		mov x2,100 //posicion y del pixel  N
+
+		bl ubicar_pixel 
+		bl pintar_circulito
+
+		//segundo circulito de la primera fila verde 
+		//se utiliza el mismo valor de altura x2
+		mov x1,400 //posicion x del pixel  N 
+		
+		bl ubicar_pixel 
+		bl pintar_circulito
+
+		//primer circulito de la segunda fila verde
+		mov x1,50 //posicion x del pixel  N 
+		mov x2,300//posicion y del pixel  N
+		
+		bl ubicar_pixel
+		bl pintar_circulito
+
+		//segundo circulito de la segunda fila verde
+		//se utiliza el mismo valor de altura x2
+		mov x1,400 //posicion x del pixel  N 
+		
+		bl ubicar_pixel 
+		bl pintar_circulito
 
 		br lr 
 
+	//Este procedimiento pinta los cuatro circulitos rojos que estan al fondo de la pantalla
+
+pintar_mini_circulitos_rojos:
+		
+		ldr x10,circulo_fondo_rojo // cargo el color rojo
+
+		//primer circulito de la primera fila roja 
+		mov x1,50 //posicion x del pixel  N 
+		mov x2,100 //posicion y del pixel  N
+
+		bl ubicar_pixel 
+		bl pintar_circulito
+
+		//segundo circulito de la primera fila roja 
+		//se utiliza el mismo valor de altura x2
+		mov x1,400 //posicion x del pixel  N 
+		
+		bl ubicar_pixel 
+		bl pintar_circulito
+
+		//primer circulito de la segunda fila roja
+		mov x1,50 //posicion x del pixel  N 
+		mov x2,300//posicion y del pixel  N
+		
+		bl ubicar_pixel
+		bl pintar_circulito
+
+		//segundo circulito de la segunda fila roja
+		//se utiliza el mismo valor de altura x2
+		mov x1,400 //posicion x del pixel  N 
+		
+		bl ubicar_pixel 
+		bl pintar_circulito
+
+		br lr 
+
+	//Este procedimiento pinta los cuatro triangulitos amarillos que estan al fondo de la pantalla
+
+pintar_mini_triangulitos_amarillos:
+		
+		ldr x10,triangulo_fondo_amarillo // cargo el color amarillo
+
+		//primer triangulito de la primera fila amarillo 
+		mov x1,50 //posicion x del pixel  N 
+		mov x2,100 //posicion y del pixel  N
+
+		bl ubicar_pixel 
+		bl pintar_triangulo
+
+		//segundo triangulito de la primera fila amarillo
+		//se utiliza el mismo valor de altura x2
+		mov x1,400 //posicion x del pixel  N 
+		
+		bl ubicar_pixel 
+		bl pintar_triangulo
+
+		//primer triangulito de la segunda fila amarillo
+		mov x1,50 //posicion x del pixel  N 
+		mov x2,300//posicion y del pixel  N
+		
+		bl ubicar_pixel
+		bl pintar_triangulo
+
+		//segundo triangulito de la segunda fila amarillo
+		//se utiliza el mismo valor de altura x2
+		mov x1,400 //posicion x del pixel  N 
+		
+		bl ubicar_pixel 
+		bl pintar_triangulo
+
+		br lr 
+
+
+	//Este procedimiento pinta los cuatro triangulitos rosados que estan al fondo de la pantalla
+
+
+pintar_mini_triangulitos_rosados:
+	
+		ldr x10,triangulo_fondo_rosa // cargo el color rosa
+
+		//primer triangulito de la primera fila rosa 
+		mov x1,50 //posicion x del pixel  N 
+		mov x2,100 //posicion y del pixel  N
+
+		bl ubicar_pixel 
+		bl pintar_triangulo
+
+		//segundo triangulito de la primera fila rosa 
+		//se utiliza el mismo valor de altura x2
+		mov x1,400 //posicion x del pixel  N 
+		
+		bl ubicar_pixel 
+		bl pintar_triangulo
+
+		//primer triangulito de la segunda fila rosa
+		mov x1,50 //posicion x del pixel  N 
+		mov x2,300//posicion y del pixel  N
+		
+		bl ubicar_pixel
+		bl pintar_triangulo
+
+		//segundo triangulito de la segunda fila rosa
+		//se utiliza el mismo valor de altura x2
+		mov x1,400 //posicion x del pixel  N 
+		
+		bl ubicar_pixel 
+		bl pintar_triangulo
+
+		br lr 
+
+
+	//Este procedimiento pinta los cuatro cuadraditos violetas que estan al fondo de la pantalla
+*/
+pintar_mini_cuadrados_violetas:
+		
+		sub sp,sp,#8
+		str lr,[sp]
+
+
+		ldr x10,cuadrado_fondo_violeta // cargo el color Violeta
+
+		//primer cuadradito de la primera fila violeta 
+		mov x1,50 //posicion x del pixel  N 
+		mov x2,190 //posicion y del pixel  N
+
+		bl ubicar_pixel 
+		bl pintar_cuadrado
+
+
+		//segundo cuadradito de la primera fila violeta 
+		//se utiliza el mismo valor de altura x2
+		mov x1,420 //posicion x del pixel  N 
+		
+		bl ubicar_pixel 
+		bl pintar_cuadrado
+
+
+		//primer cuadradito de la segunda fila violeta
+		mov x1,50 //posicion x del pixel  N 
+		mov x2,430 //posicion y del pixel  N
+		
+		bl ubicar_pixel
+		bl pintar_cuadrado
+
+		//segundo cuadradito de fila uno
+		//se utiliza el mismo valor de altura x2
+		mov x1,420 //posicion x del pixel  N 
+		
+		bl ubicar_pixel 
+		bl pintar_cuadrado
+
+		ldr lr,[sp]
+		add sp,sp,#8
+
+		br lr 
+
+
+
+
+	//Este procedimiento pinta los cuatro cuadraditos celestes que estan al fondo de la pantalla
+
+
 pintar_mini_cuadrados_celestes:
 		
-		ldr x10,cuadrado_fondo_celeste
-		mov x1,150 //posicion x
-		mov x2,150 //posicion y
-		mov x3,75 //ancho x
-		mov x4,75 //altura y
+		sub sp,sp,#8
+		str lr,[sp]
 
-		bl ubicar_pixel //devuelve el pixel desde donde comenzar a pintar
+
+
+		ldr x10,cuadrado_fondo_celeste// cargo el color celeste
+
+		//primer cuadradito de fila uno
+		mov x1,30 //posicion x del pixel  N 
+		mov x2,65 //posicion y del pixel  N
+
+		bl ubicar_pixel 
 
 		bl pintar_cuadrado
+		
+		//segundo cuadradito de fila uno
+		//se utiliza el mismo valor de altura x2
+		mov x1,400 //posicion x del pixel  N 
+		
+		bl ubicar_pixel 
+		bl pintar_cuadrado
+
+
+		//primer cuadradito de fila dos
+		mov x1,30 //posicion x del pixel  N 
+		mov x2,300//posicion y del pixel  N
+		
+		bl ubicar_pixel
+		bl pintar_cuadrado
+
+		//segundo cuadradito de fila uno
+		//se utiliza el mismo valor de altura x2
+		mov x1,400 //posicion x del pixel  N 
+		
+		bl ubicar_pixel 
+		bl pintar_cuadrado
+
+		ldr lr,[sp]
+		add sp,sp,#8
+
 		br lr 
 
 color_fondo:
 		
-		ldr x10,color_rosa_fondo
-		mov x1,0 //posicion x
-		mov x2,0 //posicion y
-		mov x3,SCREEN_WIDTH //ancho x
-		mov x4,SCREEN_HEIGH //altura y
+		sub sp,sp,#8
+		str lr,[sp]
 
-		bl ubicar_pixel //devuelve el pixel desde donde comenzar a pintar
+		ldr x10,color_rosa_fondo
+
+		mov x1,0
+		mov x2,0
+
+		bl ubicar_pixel
+
+		mov x7,SCREEN_WIDTH //contiene el ancho en x del cuadrado
+		mov x8,SCREEN_HEIGH //contiene el ancho en y del cuadrado
 
 		bl pintar_cuadrado
+
+
+		ldr lr,[sp]
+		add sp,sp,#8
+
 		br lr
 
 
-pintar_fondo:
-		
+pintar_figuras_de_fondo:
+
+		sub sp,sp,#8
+		str lr,[sp]
+
 		bl color_fondo
-		//bl pintar_mini_cuadrados_celestes
+
+		mov x7,35
+		mov x8,35
+
+
+		bl pintar_mini_cuadrados_celestes	
+		bl pintar_mini_cuadrados_violetas
+		//bl pintar_mini_triangulitos_rosados
+		//bl pintar_mini_triangulitos_amarillos
+		//bl pintar_mini_circulos_rojos
+		//bl pintar_mini_circulos_verdes
+
+		ldr lr,[sp]
+		add sp,sp,#8
+
+		br lr
+
+
+
+pintar_bloques_celestes:
+		
+		sub sp,sp,#8
+		str lr,[sp]
+
+		ldr x10,color_bloque_celeste
+
+		mov x1,364  //posicion x del pixel N
+		mov x2,420  //posicion y del pixel N
+
+		bl ubicar_pixel
+
+		mov x7,276  //contiene el ancho en x del cuadrado
+		mov x8,60  //contiene el alto en y del cuadrado
+		
+		bl pintar_cuadrado
+
+
+		bl pintar
+
+		ldr lr,[sp]
+		add sp,sp,#8
+
+
+		br lr
+
+
+pintar_bloques_rojos:
+		
+		sub sp,sp,#8
+		str lr,[sp]
+
+		ldr x10,color_bloque_rojo
+
+		//pinto el primer rectangulo rojo
+		mov x1,91  //posicion x del pixel N
+		mov x2,180  //posicion y del pixel N
+
+		bl ubicar_pixel
+		
+		mov x7,91   //contiene el ancho en x del cuadrado
+		mov x8,120  //contiene el alto en y del cuadrado
+		
+
+		bl pintar_cuadrado
+
+		//pinto el segundo rectangulo rojo
+		mov x1,182  //posicion x del pixel N
+		mov x2,120  //posicion y del pixel N
+
+		bl ubicar_pixel
+		
+		mov x7,91   //contiene el ancho en x del cuadrado
+		mov x8,120  //contiene el alto en y del cuadrado
+		
+
+		bl pintar_cuadrado
+		
+		//pinto el tercer rectangulo rojo
+		mov x1,273  //posicion x del pixel N
+		mov x2,360  //posicion y del pixel N
+
+		bl ubicar_pixel
+		
+		mov x7,91   //contiene el ancho en x del cuadrado
+		mov x8,120  //contiene el alto en y del cuadrado
+		
+
+		bl pintar_cuadrado
+			
+		//pinto el cuarto rectangulo rojo
+		mov x1,364  //posicion x del pixel N
+		mov x2,300  //posicion y del pixel N
+
+		bl ubicar_pixel
+		
+		mov x7,91   //contiene el ancho en x del cuadrado
+		mov x8,120  //contiene el alto en y del cuadrado
+		
+
+		bl pintar_cuadrado
+
+		ldr lr,[sp]
+		add sp,sp,#8
+
+		br lr
+
+
+pintar_bloques_violetas:
+		
+		sub sp,sp,#8
+		str lr,[sp]
+
+		ldr x10,color_bloque_violeta
+
+		//pinto el rectangulo violeta
+		mov x1,91  //posicion x del pixel N
+		mov x2,300  //posicion y del pixel N
+
+		bl ubicar_pixel
+
+		mov x7,273   //contiene el ancho en x del cuadrado
+		mov x8,60  //contiene el alto en y del cuadrado
 		
 		
-		/*bl pintar_mini_cuadrados_violetas
-		bl pintar_mini_circulos_verdes
-		bl pintar_mini_circulos_rojos
-		bl pintar_mini_triangulos_rosados
-		bl pintar_mini_triangulos_amarillos
-		*/
-		br lr 
+		bl pintar_cuadrado
+
+		//pinto el cuadrado violeta
+		mov x1,182  //posicion x del pixel N
+		mov x2,240  //posicion y del pixel N
+
+		bl ubicar_pixel
+
+		mov x7,91   //contiene el ancho en x del cuadrado
+		mov x8,60  //contiene el alto en y del cuadrado
+
+		bl pintar_cuadrado
+
+		//pinto el rectangulo violeta
+
+		mov x1,455  //posicion x del pixel N
+		mov x2,240  //posicion y del pixel N
+
+		bl ubicar_pixel
+
+		mov x7,91   //contiene el ancho en x del cuadrado
+		mov x8,180  //contiene el alto en y del cuadrado
+
+		bl pintar_cuadrado
 
 
-tetris:
+		//pinto cuadrado violeta
 
-	br lr 
+		mov x1,546  //posicion x del pixel N
+		mov x2,360  //posicion y del pixel N
 
+		bl ubicar_pixel
+
+		mov x7,94   //contiene el ancho en x del cuadrado
+		mov x8,60  //contiene el alto en y del cuadrado
+
+		bl pintar_cuadrado
+
+
+		ldr lr,[sp]
+		add sp,sp,#8
+
+		br lr
+
+pintar_bloques_amarillos:
+		
+		sub sp,sp,#8
+		str lr,[sp]
+
+		ldr x10,color_bloque_amarillo
+
+		//pinto el primer cuadrado amarillo
+		mov x1,91  //posicion x del pixel N
+		mov x2,360  //posicion y del pixel N
+
+		bl ubicar_pixel
+
+		mov x7,182   //contiene el ancho en x del cuadrado
+		mov x8,120  //contiene el alto en y del cuadrado
+		
+		
+		bl pintar_cuadrado
+
+		//pinto el segundo cuadrado amarillo
+		mov x1,273  //posicion x del pixel N
+		mov x2,180  //posicion y del pixel N
+
+		bl ubicar_pixel
+
+		mov x7,182  //contiene el ancho en x del cuadrado
+		mov x8,120  //contiene el alto en y del cuadrado
+
+		bl pintar_cuadrado
+
+		//bl pintar_bordes_amarillos
+
+
+		ldr lr,[sp]
+		add sp,sp,#8
+
+		br lr
+
+pintar_bloques_verdes:
+
+		sub sp,sp,#8
+		str lr,[sp]
+
+		ldr x10,color_bloque_verde
+		
+		mov x1,0     //posicion x del pixel N
+		mov x2,240  //posicion y del pixel N
+
+		bl ubicar_pixel
+
+		mov x7,37   //contiene el ancho en x del rectangulo
+		mov x8,240	//contiene el alto en y del  rectangulo
+
+		bl pintar_rectangulo
+
+		//bl pintar_bordes_verdes
+
+		ldr lr,[sp]
+		add sp,sp,#8
+
+		br lr	
+
+		
+
+pintar_tetris:
+		
+		bl pintar_bloques_verdes
+		bl pintar_bloques_amarillos
+		bl pintar_bloques_violetas
+		bl pintar_bloques_rojos
+		bl pintar_bloques_celestes
+	 	ret
 main:
-	// x0 contiene la direccion base del framebuffer
-	//mov x20, x0 // Guarda la dirección base del framebuffer en x20
 	
-	bl pintar_fondo //se hace la llamada para pintar el fondo de la escenografia
-	//bl tetris se pinta el tetris
+	mov x20, x0 // Guarda la dirección base del framebuffer en x20
+	bl pintar_figuras_de_fondo
+	bl pintar_tetris
+	bl pintar_bloques_verdes
 
 
 	// Ejemplo de uso de gpios
@@ -208,14 +799,6 @@ main:
 
 	//---------------------------------------------------------------
 	// Infinite Loop
-
-
-
-
-
-
-	
-	
 
 InfLoop:
 	b InfLoop
