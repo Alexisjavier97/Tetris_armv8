@@ -6,81 +6,16 @@
 .equ GPIO_GPFSEL0, 0x00
 .equ GPIO_GPLEV0,  0x34
 
-.globl main
-
-.equ SCREEN_WIDTH,   640
-.equ SCREEN_HEIGH,   480
-.equ BITS_PER_PIXEL, 32
-
-.equ GPIO_BASE,    0x3f200000
-.equ GPIO_GPFSEL0, 0x00
-.equ GPIO_GPLEV0,  0x34
-
-.globl main
-
 //SECCION COLORES 
 
-//Bloque Verde 
+//geometry_dash
 
-color_bloque_verde: .word  0x6abe30
-color_bordea_al_bloque_verde: .word 0x37946e
-color_adentro_del_bloque_verde: .word 0xa0e570
- 
-//Bloque Amarillo
+color_cajita: .word 0x5ffcff
 
-color_bloque_amarillo: .word 0xfbf236
-color_bordea_al_bloque_amarillo: .word 0xaba62a
-color_adentro_del_bloque_amarillo: .word 0xfffcbc
 
-//Bloque Rojo
-
-color_bloque_rojo: .word 0xd95763
-color_bordea_al_bloque_rojo: .word 0xac3232
-color_adentro_del_bloque_rojo: .word 0xe07e87
-
-//Bloque Celeste
-
-color_bloque_celeste: .word 0x639bff
-color_bordea_al_celeste: .word 0x5b6ee1
-color_adentro_del_bloque_celeste: .word 0x85abed
-
-//Bloque Violeta
-
-color_bloque_violeta: .word 0x76428a 
-color_bordea_al_bloque_violeta: .word 0x3f3f74
-color_adentro_del_bloque_violeta: .word 0xc487dc
-color_sombra_en_suelo: .word 0xdb9d60
 
 
 //Colores de fondo
-
-color_desierto: .word 0xe8a669
-color_piramide_cara_frente: .word 0xb98450
-
-//COLORES PARA EL CIELO DE DIA
-
-color_cielo_dia_1 : .word 0xb0f2ff
-color_cielo_dia_2 : .word  0xb8eefa
-color_cielo_dia_3 : .word 0xbef1f5
-color_cielo_dia_4 : .word 0xc0f0f0
-color_cielo_dia_5 : .word 0xcaeeec
-color_cielo_dia_6 : .word 0xceefe8
-color_cielo_dia_7 : .word 0xddefe1
-color_cielo_dia_8 : .word 0xdfedd6
-
-//parte de atardecer
-color_cielo_dia_9 : .word 0xedecce
-color_cielo_dia_10: .word 0xe5edd5
-color_cielo_dia_11: .word 0xf2ecc8
-color_cielo_dia_12: .word 0xefeccd
-color_cielo_dia_13: .word 0xf1ebcb
-color_cielo_dia_14: .word 0xf2ecc8
-color_cielo_dia_15: .word 0xf6ecc8
-color_cielo_dia_16: .word 0xf8ecc6
-color_cielo_dia_17: .word 0xfdebc3
-color_cielo_dia_18: .word 0xf9ebc4
-color_cielo_dia_19: .word 0xfdebc3
-color_cielo_dia_20: .word 0xfeecbe
 
 //COLORES PARA EL CIELO DE NOCHE
 
@@ -108,7 +43,6 @@ color_cielo_noche_18: .word 0x0358a9
 
 color_piramide_frente_noche: .word 0x010812
 color_piramide_atras_noche:  .word 0x06182c
-color_base_inferior_noche:   .word 0x010b14
-color_base_superior_noche:   .word 0x0a253a
+color_suelo_inferior_noche:   .word 0x010b14
+color_suelo_superior_noche:   .word 0x0a253a
 color_de_la_luna: .word 0xf5f9fa
-color_del_sol: .word 0xffff00

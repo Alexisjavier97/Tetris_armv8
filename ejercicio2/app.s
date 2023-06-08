@@ -1,12 +1,13 @@
 .include "graficos.s" 
 
+
+.globl main
+
 main:
-	
-	mov x20, x0 // Guarda la dirección base del framebuffer en x20
+	//guardo en x19 el GPIO_BASE
+	mov x19,GPIO_BASE
 
-	//bl pintar_fondo_de_dia
-	//bl pintar_sol
 	bl pintar_fondo_de_noche
-
+	bl cuadradito
 InfLoop:
 	b InfLoop
