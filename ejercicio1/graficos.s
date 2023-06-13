@@ -3,19 +3,61 @@
 pintar_sol:
 	
 	sub sp, sp, #8 // Guardo el puntero de retorno en el stack
-    str lr, [sp]
+        str lr, [sp]
+	
+	//linea superior que decora el sol
+	ldr x10,color_del_sol		
+	mov x1,45	 	// posicion x inicial del pixel
+	mov x2,35	       // posicion y inicial del pixel
+	mov x3,200  //posicion x final del pixel
+	mov x4,37            // posicion y final del pixel
 
+	bl ubicar_pixel
+	bl pintar_rectangulo
+	
+	//lineas inferiores que  decoran el sol
+	
+	//linea 1
+
+	ldr x10,color_del_sol		
+	mov x1,35	 	// posicion x inicial del pixel
+	mov x2,104	       // posicion y inicial del pixel
+	mov x3,300  //posicion x final del pixel
+	mov x4,106            // posicion y final del pixel
+
+	bl ubicar_pixel
+	bl pintar_rectangulo
+		
+	// linea 2
+
+	ldr x10,color_del_sol		
+	mov x1,45	 	// posicion x inicial del pixel
+	mov x2,110	       // posicion y inicial del pixel
+	mov x3,200  //posicion x final del pixel
+	mov x4,112            // posicion y final del pixel
+
+	bl ubicar_pixel
+	bl pintar_rectangulo
+			
+
+
+
+
+
+
+
+	//Pinto el sol
 	ldr x10,color_del_sol
-	mov x2,110
-	mov x3,30
-	mov x4,20	
+	mov x1,120  //valor de coordenada x central del circulo
+	mov x2,70   //valor de coordenada y central del circulo
+	mov x4,30   //uso el x4 como radio del circulo	
 	
 	bl pintarCirculo
 
 	ldr lr, [sp] // Recupero el puntero de retorno del stack
-    add sp, sp, #8 
+    	add sp, sp, #8 
 
-    br lr // return
+    	br lr
 
 
 
@@ -252,7 +294,7 @@ pintar_fondo_de_dia:
 		bl pintar_desierto_de_dia
 		bl pintar_cielo_de_dia
 		bl pintar_piramides_de_dia
-
+		bl pintar_sol
 		leer_tecla:
 
 			str wzr,[x19,GPIO_GPFSEL0]

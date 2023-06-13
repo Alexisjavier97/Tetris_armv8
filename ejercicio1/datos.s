@@ -69,4 +69,4 @@ color_piramide_atras_noche:  .word 0x06182c
 color_suelo_inferior_noche:   .word 0x010b14
 color_suelo_superior_noche:   .word 0x0a253a
 color_de_la_luna: .word 0xf5f9fa
-color_del_sol: .word 0xffff00
+color_del_sol: .word 0x0xf5a51c
