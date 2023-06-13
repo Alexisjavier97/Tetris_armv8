@@ -57,7 +57,7 @@ pintar_sol:
 	ldr lr, [sp] // Recupero el puntero de retorno del stack
     	add sp, sp, #8 
 
-    	br lr
+    	br lr 
 
 
 
@@ -303,7 +303,7 @@ pintar_fondo_de_dia:
 			cbnz w17,pintar_fondo_de_noche		
 
 			b leer_tecla 
-
+		
 		ldr lr,[sp]
 		add sp,sp,#8
 		br lr
@@ -510,7 +510,28 @@ pintar_desierto_noche:
 		add sp,sp,#8
 
 		br lr
+
+pintar_luna:
 	
+	sub sp,sp,#8
+	str lr,[sp]	
+
+
+	//Pinto la luna
+	ldr x10,color_de_la_luna
+	mov x1,120  //valor de coordenada x central del circulo
+	mov x2,70   //valor de coordenada y central del circulo
+	mov x4,30   //uso el x4 como radio del circulo	
+	
+	bl pintarCirculo
+
+	ldr lr,[sp]
+	add sp,sp,#8
+
+	br lr	
+
+
+
 pintar_fondo_de_noche:
 
 		sub sp,sp,#8
@@ -519,6 +540,8 @@ pintar_fondo_de_noche:
 		bl pintar_desierto_noche
 		bl pintar_cielo_noche
 		bl pintar_piramides_noche
+
+		bl pintar_luna
 
 		ldr lr,[sp]
 		add sp,sp,#8

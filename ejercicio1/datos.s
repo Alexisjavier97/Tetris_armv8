@@ -15,6 +15,7 @@ color_sombra_en_suelo: .word 0xdb9d60
 color_desierto: .word 0xe8a669
 color_piramide_cara_frente: .word 0xb98450
 
+
 //COLORES PARA EL CIELO DE DIA
 
 color_cielo_dia_1 : .word 0xb0f2ff
@@ -69,4 +70,4 @@ color_piramide_atras_noche:  .word 0x06182c
 color_suelo_inferior_noche:   .word 0x010b14
 color_suelo_superior_noche:   .word 0x0a253a
 color_de_la_luna: .word 0xf5f9fa
-color_del_sol: .word 0x0xf5a51c
+color_del_sol: .word 0xf5a51c

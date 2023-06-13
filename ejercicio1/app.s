@@ -8,6 +8,5 @@ main:
 	mov x19,GPIO_BASE
 
 	bl pintar_fondo_de_dia
-
 InfLoop:
 	b InfLoop
